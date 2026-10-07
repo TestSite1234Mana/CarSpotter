@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#7C3AED">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="CarSpotter">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+  <title>CarSpotter</title>
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">PERSONAL CAR LOG</div>
+        <h1>CarSpotter</h1>
+      </div>
+      <button class="icon-btn accent" id="topAdd" aria-label="Add car">＋</button>
+    </header>
+
+    <main>
+      <section id="carsPage" class="page">
+        <div class="hero-card">
+          <div>
+            <div class="hero-number" id="heroCount">0</div>
+            <div class="muted">cars spotted</div>
+          </div>
+          <div class="hero-stat">
+            <strong id="heroFavorites">0</strong>
+            <span>favorites</span>
+          </div>
+          <div class="hero-stat">
+            <strong id="heroMakes">0</strong>
+            <span>makes</span>
+          </div>
+        </div>
+
+        <div class="search-row">
+          <input id="search" type="search" placeholder="Search make, model, tags..." autocomplete="off">
+          <button id="filterBtn" class="secondary-btn">Filter</button>
+        </div>
+
+        <div id="filters" class="filters hidden">
+          <select id="tagFilter"><option value="">All tags</option></select>
+          <select id="driveFilter">
+            <option value="">All drivetrains</option>
+            <option>FWD</option><option>RWD</option><option>AWD</option><option>4WD</option>
+          </select>
+          <label class="check"><input type="checkbox" id="favFilter"> Favorites only</label>
+          <select id="sortFilter">
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+            <option value="make">Make A–Z</option>
+            <option value="power">Power high–low</option>
+          </select>
+        </div>
+
+        <div id="carGrid" class="car-grid"></div>
+        <div id="emptyState" class="empty-state">
+          <div class="empty-icon">🚗</div>
+          <h2 id="emptyTitle">No cars yet</h2>
+          <p id="emptyText">Start your collection with your first sighting.</p>
+          <button class="primary-btn" id="emptyAdd">Add your first car</button>
+        </div>
+      </section>
+
+      <section id="statsPage" class="page hidden">
+        <div class="section-title"><span>Statistics</span><small>Your collection</small></div>
+        <div class="stat-grid">
+          <div class="stat-card"><span>Total sightings</span><strong id="statTotal">0</strong></div>
+          <div class="stat-card"><span>Favorites</span><strong id="statFavs">0</strong></div>
+          <div class="stat-card"><span>Different makes</span><strong id="statMakes">0</strong></div>
+          <div class="stat-card"><span>Different models</span><strong id="statModels">0</strong></div>
+        </div>
+        <div class="panel">
+          <h3>Top makes</h3>
+          <div id="makeStats"></div>
+        </div>
+        <div class="panel">
+          <h3>Top tags</h3>
+          <div id="tagStats"></div>
+        </div>
+      </section>
+
+      <section id="settingsPage" class="page hidden">
+        <div class="section-title"><span>Settings</span><small>Data & app</small></div>
+        <div class="panel">
+          <h3>Backup</h3>
+          <p class="muted">Export every car and its photos to one backup file. Keep this somewhere safe.</p>
+          <div class="button-stack">
+            <button class="primary-btn" id="exportBtn">Export collection</button>
+            <label class="secondary-btn file-btn">Import collection<input type="file" id="importInput" accept=".json,application/json"></label>
+          </div>
+        </div>
+        <div class="panel danger-panel">
+          <h3>Danger zone</h3>
+          <p class="muted">This permanently deletes the local collection on this device.</p>
+          <button class="danger-btn" id="deleteAllBtn">Delete all cars</button>
+        </div>
+        <div class="panel">
+          <h3>About</h3>
+          <p class="muted">CarSpotter is a private, local-first PWA. Your collection stays in this browser unless you export or share a backup.</p>
+        </div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav">
+      <button class="nav-btn active" data-page="carsPage">🚗<span>Cars</span></button>
+      <button class="nav-btn" data-page="statsPage">📊<span>Stats</span></button>
+      <button class="nav-add" id="navAdd">＋</button>
+      <button class="nav-btn" data-page="settingsPage">⚙️<span>Settings</span></button>
+    </nav>
+  </div>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-sheet">
+      <div class="modal-head">
+        <h2 id="modalTitle">Add car</h2>
+        <button class="icon-btn" id="closeModal">×</button>
+      </div>
+      <form id="carForm">
+        <input type="hidden" id="carId">
+        <div class="photo-picker" id="photoPicker">
+          <img id="photoPreview" alt="Car preview">
+          <span id="photoPlaceholder">📷<br><small>Add a photo</small></span>
+        </div>
+        <div class="photo-buttons">
+          <label class="secondary-btn photo-button">
+            📷 Take photo
+            <input type="file" id="cameraInput" accept="image/*" capture="environment">
+          </label>
+          <label class="secondary-btn photo-button">
+            🖼️ Choose from gallery
+            <input type="file" id="galleryInput" accept="image/*">
+          </label>
+        </div>
+
+        <div class="two-col">
+          <div><label>Make<input id="make" required placeholder="BMW"></label></div>
+          <div><label>Model<input id="model" required placeholder="M3 E46"></label></div>
+        </div>
+        <div class="two-col">
+          <div><label>Year<input id="year" type="number" min="1886" max="2100" placeholder="2004"></label></div>
+          <div><label>Date seen<input id="dateSeen" type="date" required></label></div>
+        </div>
+        <label>Location<input id="location" placeholder="Pforzheim, Germany"></label>
+        <div class="two-col">
+          <div><label>Engine<input id="engine" placeholder="3.2L I6"></label></div>
+          <div><label>Power<input id="power" placeholder="343 hp"></label></div>
+        </div>
+        <div class="two-col">
+          <div>
+            <label>Drivetrain
+              <select id="drivetrain"><option value="">Unknown</option><option>FWD</option><option>RWD</option><option>AWD</option><option>4WD</option></select>
+            </label>
+          </div>
+          <div><label>Tags<input id="tags" placeholder="JDM, Rare, Sport"></label></div>
+        </div>
+        <label>Notes<textarea id="notes" placeholder="What made this sighting interesting?"></textarea></label>
+        <label class="check big-check"><input type="checkbox" id="favorite"> ⭐ Favorite</label>
+        <button class="primary-btn" type="submit">Save car</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="detailModal" class="modal hidden">
+    <div class="modal-sheet detail-sheet">
+      <div class="modal-head">
+        <h2 id="detailTitle">Car</h2>
+        <button class="icon-btn" id="closeDetail">×</button>
+      </div>
+      <img id="detailImage" class="detail-image" alt="Car">
+      <div class="detail-actions">
+        <button id="detailFavorite" class="secondary-btn">☆ Favorite</button>
+        <button id="detailEdit" class="secondary-btn">Edit</button>
+        <button id="detailDelete" class="danger-btn">Delete</button>
+      </div>
+      <div id="detailBody" class="detail-body"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

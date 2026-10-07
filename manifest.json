@@ -1,0 +1,10 @@
+{
+  "name": "CarSpotter",
+  "short_name": "CarSpotter",
+  "description": "Private personal car spotting log",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#19181B",
+  "theme_color": "#7C3AED",
+  "orientation": "portrait"
+}
